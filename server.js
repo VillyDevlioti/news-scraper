@@ -18,33 +18,40 @@ db.on("error", function(error) {
   console.log("Database Error:", error);
 });
 
-// Make a request via axios to grab the HTML body from the site of your choice
-axios.get("https://www.nytimes.com").then(function(response) {
-  console.log(response.data);
+app.get("/", function(req, res) {
+    res.sendFile(__dirname + '/public/index.html');
+    app.use(express.static(__dirname + '/public'));
+}); 
 
-  // Load the HTML into cheerio and save it to a variable
-  // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
-  var $ = cheerio.load(response.data);
+app.get("/nytimes", function(req, res){
+    // An empty array to save the data that we'll scrape
+    var data = {};
 
-  // An empty array to save the data that we'll scrape
-  var results = [];
-
-  // Select each element in the HTML body from which you want information.
-   $("article").each(function(i, element) {
+    axios.get("https://www.nytimes.com").then(function(response) {
+        console.log(response.data);
+        
+        // Load the HTML into cheerio and save it to a variable
+        // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
+        var $ = cheerio.load(response.data);
+        
+        // Select each element in the HTML body from which you want information.
+        $("article").each(function(i, element) {
     
-    //variables to hold title, link and description
-    var title = $(element).children().text();
-    var link = $(element).find("a").attr("href");
-    var desc = $(element).children().find("p").text();
-    console.log
-    // Save these results in an object that we'll push into the results array we defined earlier
-    results.push({
-      title: title,
-      link: link,
-      desc: desc
-    });
-  });
+            data[i] = { 
+                //variables to hold title, link and description
+                title : $(element).children().text(),
+                link: "https://www.nytimes.com"+$(element).find("a").attr("href"),
+                desc : $(element).children().find("p").text()
+            };
+        });
+        // Log the results once you've looped through each of the elements found with cheerio
+        console.log(data); 
+        res.json(data);
+        });
+    });      
 
-  // Log the results once you've looped through each of the elements found with cheerio
-  console.log(results); 
+// Make a request via axios to grab the HTML body from the site of your choice
+
+app.listen(3000, function() {
+    console.log("App running on port 3000!");
 });

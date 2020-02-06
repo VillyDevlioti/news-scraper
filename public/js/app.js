@@ -9,40 +9,77 @@ $(document).ready(function(){
     //activate the dropdown
     $(".dropdown-trigger").dropdown();
 
-    //checking what the user has clicked
+    //checking WHEN the user has clicked NYTIMES
     $("#ny-times").on("click", function(){
         console.log("clicked!");
-        $.getJSON("/nytimes", function(data){
-            console.log(data);
-            displayHeadlines(data);
+        $.getJSON("/nytimes", function(data) {
+            //console.log(data);
+            displayHeadlines(data); 
+        });
+    });
+    //checking WHEN the user has clicked BUZZFEED
+    $("#buzzfeed").on("click", function(){
+        console.log("clicked!");
+        $.getJSON("/buzzfeed", function(data) {
+            //console.log(data);
+            displayHeadlines(data); 
+        });
+    });
+    //checking WHEN the user has clicked TECHCRUNCH
+    $("#techcrunch").on("click", function(){
+        console.log("clicked!");
+        $.getJSON("/techcrunch", function(data) {
+            //console.log(data);
+            displayHeadlines(data); 
         });
     });
 
     function displayHeadlines(data) {
-        const values = Object.values(data)
-        console.log("inside display");
+        //const values = Object.values(data)
+        console.log("DATA", data)
         headline.empty();
-        
-        for (const value of values) {
-            console.log(value.title);
-            console.log(value.link);
-            console.log(value.desc);
-            headline.add("div").addClass("card");
-            headline.append("<span class=\"card-title\">"+value.title);
-            headline.append("<a class=\"btn-floating halfway-fab waves-effect waves-light red\"><i class=\"material-icons\">add</i></a>")
-            headline.append("<div class=\"card-content\"><p>"+value.desc); 
-            headline.append("<a href=\""+value.link+"\" class=\"waves-effect waves-light btn\">Link</a>")
+        for (var i=0; i<data.length; i++) {
+            var card = $("<div>").addClass("card");
+            let title = $("<span>").addClass("card-title").text(data[i].title);
+            var link = $("<a>").addClass("link-to-article").attr("href", data[i].link);
+            var button = $("<a>").addClass("btn-floating halfway-fab waves-effect waves-light red save-button");
+            var icon = $("<i>").addClass("material-icons").text("add");
+            var desc= $("<div>").addClass("card-content").text(data[i].desc);
+            link.append(title);
+            button.append(icon);
+            card.append(link,desc,button);
+            headline.append(card);
+
+            //console.log("BEFORE CLICK", title[0].innerText,desc[0].innerText,link[0].href);
+
         }
+
+        checkForClicks();
+
     }
 
+    function checkForClicks(){
+        $(".save-button").on("click", function(event){
+            console.log($(this));
+            let articleTitleToSave = $(this)["0"].parentElement.firstChild.text;
+            let descriptionToSave = $(this)["0"].previousElementSibling.innerText;
+            let linkToSave = $(this)["0"].parentElement.firstChild.href;
+            saveToDb(articleTitleToSave,descriptionToSave,linkToSave)
+
+        });
+    }
+
+    function saveToDb(title, desc, link){
+        console.log(title, desc, link)
+    
+        $.post({
+            url: "/saved-articles/",
+            data: {
+                title: title,
+                link: link,
+                description: desc,
+            }
+        });
+    }
 
 });
-
-
-/* <div class="card">
-  <span class="card-title">Card Title</span>
-  <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
-  <div class="card-content">
-  <p>I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.</p>
-</div>
-</div> */

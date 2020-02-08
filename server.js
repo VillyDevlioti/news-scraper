@@ -5,8 +5,6 @@
 var express = require("express");
 var mongoose = require("mongoose");
 var app = express();
-var htmlRoute = require("./routes/htmlRoutes.js");
-//var apiRoute = require("./routes/apiRoutes.js");
 
 // Parse request body as JSON
 app.use(express.urlencoded({ extended: true }));
@@ -19,8 +17,8 @@ app.use(express.static("public"));
 // Connect to the Mongo DB
 mongoose.connect("mongodb://localhost/scrapedarticlesdb", { useNewUrlParser: true });
 
-//call the html Routes
-app.use(htmlRoute);
+//call the html/api Routes
+require('./routes/htmlRoutes')(app);
 require('./routes/apiRoutes')(app);
 
 app.listen(3000, function() {

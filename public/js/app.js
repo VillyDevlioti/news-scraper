@@ -28,7 +28,6 @@ $(document).ready(function(){
     //checking WHEN the user has clicked NYTIMES
     $("#nytimes").on("click", function(){
         var url = getURL($(this));
-        console.log("before api", url);
         API.getArticles(url);
 
     });

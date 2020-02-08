@@ -1,5 +1,21 @@
 $(document).ready(function(){
 
+    var API = {
+        getArticles: function(url) {
+        console.log("inside query func");
+        queryURL = "/" + url;
+        console.log(queryURL);
+        return $.ajax({
+            url: queryURL,
+            type: "GET"
+            })
+            .then(function(data){
+                console.log(data);
+                displayHeadlines(data);
+            });
+        }
+    }
+
     //just letting you know that the page is loaded
     console.log("page loaded");
 
@@ -10,28 +26,24 @@ $(document).ready(function(){
     $(".dropdown-trigger").dropdown();
 
     //checking WHEN the user has clicked NYTIMES
-    $("#ny-times").on("click", function(){
-        console.log("clicked!");
-        $.getJSON("/nytimes", function(data) {
-            //console.log(data);
-            displayHeadlines(data); 
-        });
+    $("#nytimes").on("click", function(){
+        var url = getURL($(this));
+        API.getArticles(url);
+
     });
     //checking WHEN the user has clicked BUZZFEED
     $("#buzzfeed").on("click", function(){
-        console.log("clicked!");
-        $.getJSON("/buzzfeed", function(data) {
-            //console.log(data);
-            displayHeadlines(data); 
-        });
+        var url = getURL($(this));
+        API.getArticles(url);
     });
     //checking WHEN the user has clicked TECHCRUNCH
     $("#techcrunch").on("click", function(){
+        var url = getURL($(this));
+        API.getArticles(url);
+    });
+    //checking for saved articles
+    $("#view-saved").on("click", function(){
         console.log("clicked!");
-        $.getJSON("/techcrunch", function(data) {
-            //console.log(data);
-            displayHeadlines(data); 
-        });
     });
 
     function displayHeadlines(data) {
@@ -49,13 +61,8 @@ $(document).ready(function(){
             button.append(icon);
             card.append(link,desc,button);
             headline.append(card);
-
-            //console.log("BEFORE CLICK", title[0].innerText,desc[0].innerText,link[0].href);
-
         }
-
         checkForClicks();
-
     }
 
     function checkForClicks(){
@@ -69,11 +76,12 @@ $(document).ready(function(){
         });
     }
 
+    //saving articles to dB
     function saveToDb(title, desc, link){
         console.log(title, desc, link)
     
         $.post({
-            url: "/saved-articles/",
+            url: "/saved-articles",
             data: {
                 title: title,
                 link: link,
@@ -81,5 +89,14 @@ $(document).ready(function(){
             }
         });
     }
+
+    //getting url to feed into API call
+    function getURL(object){
+        //console.log("clicked!");
+        var url = object[0].id;
+        //console.log(url);
+        return url;
+    }
+
 
 });

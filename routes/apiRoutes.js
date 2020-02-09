@@ -98,15 +98,16 @@ module.exports = function(app) {
     //Getting saved articles page
     app.get("/saved-articles", function (req, res){
         // TODO: Finish the route so it grabs all of the articles
-    db.Article.find({})
-    .then(function(dbArticle) {
-        // If all articles are successfully found, send them back to the client
-        res.json(dbArticle);
-    })
-    .catch(function(err) {
-        // If an error occurs, send the error back to the client
-        res.json(err);
-    });
+        db.Article.find({})
+        .then(function(dbArticle) {
+            // If all articles are successfully found, send them back to the client
+            console.log("print saved articles")
+            res.json(dbArticle);
+        })
+        .catch(function(err) {
+            // If an error occurs, send the error back to the client
+            res.json(err);
+        });
     })
 
     //posting saved articles to database

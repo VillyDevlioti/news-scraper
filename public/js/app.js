@@ -13,7 +13,21 @@ $(document).ready(function(){
                 console.log(data);
                 displayHeadlines(data);
             });
-        }
+        },
+        saveToDb: function (title, desc, link){
+            console.log(title, desc, link)
+            return $.ajax({
+                url: "/saved-articles",
+                type: "POST",
+                data: {
+                    title: title,
+                    link: link,
+                    description: desc,
+                }
+            });
+        }, 
+
+        //location.href = "/members/" + data.id;
     }
 
     //just letting you know that the page is loaded
@@ -41,10 +55,12 @@ $(document).ready(function(){
         var url = getURL($(this));
         API.getArticles(url);
     });
-    //checking for saved articles
-    $("#view-saved").on("click", function(){
-        console.log("clicked!");
-    });
+/*     //checking for saved articles
+    $("#saved-articles").on("click", function(){
+        var url = getURL($(this));
+        console.log(url);
+        API.getArticles(url);
+    }); */
 
     function displayHeadlines(data) {
         //const values = Object.values(data)
@@ -71,32 +87,13 @@ $(document).ready(function(){
             let articleTitleToSave = $(this)["0"].parentElement.firstChild.text;
             let descriptionToSave = $(this)["0"].previousElementSibling.innerText;
             let linkToSave = $(this)["0"].parentElement.firstChild.href;
-            saveToDb(articleTitleToSave,descriptionToSave,linkToSave)
-
-        });
-    }
-
-    //saving articles to dB
-    function saveToDb(title, desc, link){
-        console.log(title, desc, link)
-    
-        $.post({
-            url: "/saved-articles",
-            data: {
-                title: title,
-                link: link,
-                description: desc,
-            }
+            API.saveToDb(articleTitleToSave,descriptionToSave,linkToSave);
         });
     }
 
     //getting url to feed into API call
     function getURL(object){
-        //console.log("clicked!");
         var url = object[0].id;
-        //console.log(url);
         return url;
     }
-
-
 });
